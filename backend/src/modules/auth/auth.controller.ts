@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthRequestDto } from './dto/authRequest.dto';
@@ -36,6 +36,23 @@ export class AuthController {
     return res;
   }
 
+  @Post('refresh')
+  async refresh(@Body() tokensBody: TokensDto): Promise<SuccessfulAuthenticationResponseDto> {
+    try {
+      const user = await this.jwtService.verifyAsync(tokensBody.refresh);
+      const tokens = await this._generateTokens(user);
+      return {
+        user: {
+          id: user.id,
+          username: user.username,
+        },
+        tokens,
+      };
+    } catch {
+      throw new UnauthorizedException('Refresh token invalid or expired, please reauthenticate');
+    }
+  }
+
   private async _generateTokens(user: SuccessfulAuthenticationDto): Promise<TokensDto> {
     const [access, refresh] = await Promise.all([
       this.jwtService.signAsync(
@@ -48,6 +65,7 @@ export class AuthController {
       this.jwtService.signAsync(
         {
           id: user.id,
+          username: user.username,
           uuid: randomUUID(),
         },
         {

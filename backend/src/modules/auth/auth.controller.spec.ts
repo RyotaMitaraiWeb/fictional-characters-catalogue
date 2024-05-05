@@ -6,6 +6,9 @@ import { PrismaService } from 'src/common/services/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { SuccessfulAuthenticationDto } from './dto/successfulAuthentication.dto';
 import { AuthRequestDto } from './dto/authRequest.dto';
+import { TokensDto } from './dto/tokens.dto';
+import { randomUUID } from 'crypto';
+import { UnauthorizedException } from '@nestjs/common';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -64,6 +67,38 @@ describe('AuthController', () => {
 
       expect(result.user).toEqual(user);
       expect(result.tokens).toEqual({ access: 'a', refresh: 'b' });
+    });
+  });
+
+  describe('refresh', () => {
+    it('Returns tokens and user when successful', async () => {
+      const tokens: TokensDto = {
+        access: 'a',
+        refresh: 'b',
+      };
+
+      const user: SuccessfulAuthenticationDto = {
+        id: 1,
+        username: 'ryota',
+      };
+
+      jest.spyOn(jwtService, 'verifyAsync').mockResolvedValueOnce({ ...user, uuid: randomUUID() });
+      jest.spyOn(jwtService, 'signAsync').mockResolvedValueOnce('c').mockResolvedValueOnce('d');
+
+      const result = await controller.refresh(tokens);
+      expect(result.tokens).toEqual({ access: 'c', refresh: 'd' });
+      expect(result.user).toEqual(user);
+    });
+
+    it('Throws a 401 error if an error is thrown', async () => {
+      const tokens: TokensDto = {
+        access: 'a',
+        refresh: 'b',
+      };
+
+      jest.spyOn(jwtService, 'verifyAsync').mockRejectedValueOnce(new Error());
+
+      expect(() => controller.refresh(tokens)).rejects.toThrow(UnauthorizedException);
     });
   });
 });
