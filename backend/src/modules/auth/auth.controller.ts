@@ -45,10 +45,15 @@ export class AuthController {
         },
         { expiresIn: '5m' },
       ),
-      this.jwtService.signAsync({
-        id: user.id,
-        uuid: randomUUID(),
-      }),
+      this.jwtService.signAsync(
+        {
+          id: user.id,
+          uuid: randomUUID(),
+        },
+        {
+          expiresIn: '15d',
+        },
+      ),
     ]);
 
     return { access, refresh };
