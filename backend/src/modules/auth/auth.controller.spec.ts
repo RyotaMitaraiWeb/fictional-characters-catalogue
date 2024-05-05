@@ -46,4 +46,24 @@ describe('AuthController', () => {
       expect(result.tokens).toEqual({ access: 'a', refresh: 'b' });
     });
   });
+
+  describe('login', () => {
+    it('Returns correct response when successful', async () => {
+      const register = new AuthRequestDto();
+      register.username = 'ryota';
+      register.password = '123456';
+
+      const user: SuccessfulAuthenticationDto = new SuccessfulAuthenticationDto();
+      user.id = 1;
+      user.username = register.username;
+
+      jest.spyOn(jwtService, 'signAsync').mockResolvedValueOnce('a').mockResolvedValueOnce('b');
+      jest.spyOn(authService, 'login').mockResolvedValueOnce(user);
+
+      const result = await controller.login(register);
+
+      expect(result.user).toEqual(user);
+      expect(result.tokens).toEqual({ access: 'a', refresh: 'b' });
+    });
+  });
 });

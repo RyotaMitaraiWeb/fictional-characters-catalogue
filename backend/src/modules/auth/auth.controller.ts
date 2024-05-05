@@ -25,6 +25,17 @@ export class AuthController {
     return res;
   }
 
+  @Post('login')
+  async login(@Body() body: AuthRequestDto): Promise<SuccessfulAuthenticationResponseDto> {
+    const user = await this.authService.login(body);
+    const tokens = await this._generateTokens(user);
+
+    const res = new SuccessfulAuthenticationResponseDto();
+    res.user = user;
+    res.tokens = tokens;
+    return res;
+  }
+
   private async _generateTokens(user: SuccessfulAuthenticationDto): Promise<TokensDto> {
     const [access, refresh] = await Promise.all([
       this.jwtService.signAsync(
