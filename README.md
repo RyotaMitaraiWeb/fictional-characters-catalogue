@@ -4,7 +4,7 @@ A web application which catalogues fictional characters from all sorts of movies
 ## How to run
 The easiest way to run the application is via the ``docker-compose.dev.yml`` file. Everything, including environments, has been configured so that the app can be run right out of the box.
 
-Although the dockerized backend supports hot reload, you may experience slowness in compilation. In that case, it's better to run it locally when writing code for it and only run the services that you need (like the database).
+The backend currently does not support hot reload in Docker due to slowness in compilation and a few other issues caused by bind mounts (such as the Prisma generation looking into the wrong ``node_modules`` folder). In case you want to work on something on the backend, you will need to run it locally and run the other services.
 
 ## License
 MIT
