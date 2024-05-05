@@ -16,7 +16,9 @@ import { SuccessfulAuthenticationResponseDto } from './dto/successfulAuthenticat
 import { SuccessfulAuthenticationDto } from './dto/successfulAuthentication.dto';
 import { TokensDto } from './dto/tokens.dto';
 import { randomUUID } from 'crypto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Authentication and authorization')
 @Controller('auth')
 export class AuthController {
   constructor(
