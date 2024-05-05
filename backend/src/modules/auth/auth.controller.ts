@@ -17,6 +17,7 @@ import { SuccessfulAuthenticationDto } from './dto/successfulAuthentication.dto'
 import { TokensDto } from './dto/tokens.dto';
 import { randomUUID } from 'crypto';
 import { ApiTags } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Authentication and authorization')
 @Controller('auth')
@@ -24,7 +25,10 @@ export class AuthController {
   constructor(
     private readonly jwtService: JwtService,
     private readonly authService: AuthService,
+    private readonly configService: ConfigService,
   ) {}
+
+  private _jwtSecret = this.configService.get('JWT_SECRET');
 
   @Post('register')
   async register(@Body() body: AuthRequestDto): Promise<SuccessfulAuthenticationResponseDto> {
@@ -51,7 +55,9 @@ export class AuthController {
   @Post('refresh')
   async refresh(@Body() tokensBody: TokensDto): Promise<SuccessfulAuthenticationResponseDto> {
     try {
-      const user = await this.jwtService.verifyAsync(tokensBody.refresh);
+      const user = await this.jwtService.verifyAsync(tokensBody.refresh, {
+        secret: this._jwtSecret,
+      });
       const tokens = await this._generateTokens(user);
       return {
         user: {
@@ -83,7 +89,7 @@ export class AuthController {
           id: user.id,
           username: user.username,
         },
-        { expiresIn: '5m' },
+        { expiresIn: '5m', secret: this._jwtSecret },
       ),
       this.jwtService.signAsync(
         {
@@ -93,6 +99,7 @@ export class AuthController {
         },
         {
           expiresIn: '15d',
+          secret: this._jwtSecret,
         },
       ),
     ]);
