@@ -1,4 +1,14 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Post,
+  Query,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthRequestDto } from './dto/authRequest.dto';
@@ -51,6 +61,17 @@ export class AuthController {
     } catch {
       throw new UnauthorizedException('Refresh token invalid or expired, please reauthenticate');
     }
+  }
+
+  @Get('username-exists')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async usernameExists(@Query('username') username: string): Promise<undefined> {
+    const usernameExists = await this.authService.usernameExists(username);
+    if (!usernameExists) {
+      throw new NotFoundException();
+    }
+
+    return;
   }
 
   private async _generateTokens(user: SuccessfulAuthenticationDto): Promise<TokensDto> {

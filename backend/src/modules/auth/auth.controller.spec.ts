@@ -8,7 +8,7 @@ import { SuccessfulAuthenticationDto } from './dto/successfulAuthentication.dto'
 import { AuthRequestDto } from './dto/authRequest.dto';
 import { TokensDto } from './dto/tokens.dto';
 import { randomUUID } from 'crypto';
-import { UnauthorizedException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -99,6 +99,21 @@ describe('AuthController', () => {
       jest.spyOn(jwtService, 'verifyAsync').mockRejectedValueOnce(new Error());
 
       expect(() => controller.refresh(tokens)).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('usernameExists', () => {
+    it('Returns undefined if username exists', async () => {
+      jest.spyOn(authService, 'usernameExists').mockResolvedValueOnce(true);
+
+      const result = await controller.usernameExists('a');
+      expect(result).toBeUndefined();
+    });
+
+    it('Throws a NotFoundException if username does not exist', async () => {
+      jest.spyOn(authService, 'usernameExists').mockResolvedValueOnce(false);
+
+      expect(() => controller.usernameExists('a')).rejects.toThrow(NotFoundException);
     });
   });
 });
