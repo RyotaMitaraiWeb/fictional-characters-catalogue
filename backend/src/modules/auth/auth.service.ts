@@ -43,6 +43,11 @@ export class AuthService {
     return this._toSuccessfulAuthenticationDto(user);
   }
 
+  async usernameExists(username: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({ where: { username }, select: { id: false } });
+    return user !== null;
+  }
+
   private _toSuccessfulAuthenticationDto(user: {
     id: number;
     username: string;

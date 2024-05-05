@@ -99,4 +99,20 @@ describe('AuthService', () => {
       expect(() => service.login(login)).rejects.toThrow(UnauthorizedException);
     });
   });
+
+  describe('usernameExists', () => {
+    it('Returns true if a user exists', async () => {
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce({} as any);
+
+      const result = await service.usernameExists('a');
+      expect(result).toBe(true);
+    });
+
+    it('Returns false if a user does not exist', async () => {
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce(null);
+
+      const result = await service.usernameExists('a');
+      expect(result).toBe(false);
+    });
+  });
 });
