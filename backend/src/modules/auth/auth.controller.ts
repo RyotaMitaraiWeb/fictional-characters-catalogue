@@ -1,4 +1,4 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { AuthRequestDto } from './dto/authRequest.dto';
@@ -14,7 +14,7 @@ export class AuthController {
     private readonly authService: AuthService,
   ) {}
 
-  @Get('register')
+  @Post('register')
   async register(@Body() body: AuthRequestDto): Promise<SuccessfulAuthenticationResponseDto> {
     const user = await this.authService.register(body);
     const tokens = await this._generateTokens(user);
