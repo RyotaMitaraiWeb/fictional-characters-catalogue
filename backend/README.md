@@ -37,5 +37,11 @@ npm run test:cov
 npm run test:e2e
 ```
 
+## Architecture
+The project is split into the following directories:
+- ``common`` - holds services, constants, DTOs, and other things, that are used across the app. Examples include the Prisma service (which is used in all services)
+- ``modules`` - a module for each feature of the app (e.g. character, category, etc.). Each module holds a controller, module file, service, tests, and any associated constants, all of which are used exclusively within this module.
+- ``guards`` - holds all guards
+
 ## License
 MIT
