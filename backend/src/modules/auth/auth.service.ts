@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/common/services/prisma.service';
 import { AuthRequestDto } from './dto/authRequest.dto';
 import { SuccessfulAuthenticationDto } from './dto/successfulAuthentication.dto';
@@ -13,6 +13,7 @@ export class AuthService {
   ) {}
 
   private readonly _saltRounds = Number(this.config.get('BCRYPT_SALT_ROUNDS'));
+  private readonly _loginFailedMessage = 'Wrong username or password!';
 
   async register(registerBody: AuthRequestDto): Promise<SuccessfulAuthenticationDto> {
     const user = await this.prisma.user.create({
@@ -23,6 +24,31 @@ export class AuthService {
       },
     });
 
+    return this._toSuccessfulAuthenticationDto(user);
+  }
+
+  async login(loginBody: AuthRequestDto): Promise<SuccessfulAuthenticationDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { username: loginBody.username },
+    });
+    if (user === null) {
+      throw new UnauthorizedException(this._loginFailedMessage);
+    }
+
+    const passwordMatches = await bcrypt.compare(loginBody.password, user.password);
+    if (!passwordMatches) {
+      throw new UnauthorizedException(this._loginFailedMessage);
+    }
+
+    return this._toSuccessfulAuthenticationDto(user);
+  }
+
+  private _toSuccessfulAuthenticationDto(user: {
+    id: number;
+    username: string;
+    password: string;
+    roles: string[];
+  }): SuccessfulAuthenticationDto {
     const result = new SuccessfulAuthenticationDto();
     result.id = user.id;
     result.username = user.username;

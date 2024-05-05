@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/common/services/prisma.service';
 import { AuthRequestDto } from './dto/authRequest.dto';
 import * as bcrypt from 'bcrypt';
+import { UnauthorizedException } from '@nestjs/common';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -46,6 +47,56 @@ describe('AuthService', () => {
       const result = await service.register(register);
       expect(result.id).toBe(user.id);
       expect(result.username).toBe(user.username);
+    });
+  });
+
+  describe('login', () => {
+    it('Returns a user if login is successful', async () => {
+      const login = new AuthRequestDto();
+      login.username = 'a';
+      login.password = '1';
+
+      const user = {
+        id: 1,
+        username: login.username,
+        password: login.password,
+        roles: ['User'],
+      };
+
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce(user);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(true as never);
+
+      const result = await service.login(login);
+      expect(result.id).toBe(user.id);
+      expect(result.username).toBe(user.username);
+    });
+
+    it('Throws an Unauthorized exception if the user does not exist', async () => {
+      const login = new AuthRequestDto();
+      login.username = 'a';
+      login.password = '1';
+
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce(null);
+
+      expect(() => service.login(login)).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('Throws an Unauthorized exception if the password is wrong', async () => {
+      const login = new AuthRequestDto();
+      login.username = 'a';
+      login.password = '1';
+
+      const user = {
+        id: 1,
+        username: login.username,
+        password: login.password,
+        roles: ['User'],
+      };
+
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValueOnce(user);
+      jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false as never);
+
+      expect(() => service.login(login)).rejects.toThrow(UnauthorizedException);
     });
   });
 });
