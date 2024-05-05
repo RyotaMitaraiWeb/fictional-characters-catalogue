@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   async usernameExists(username: string): Promise<boolean> {
-    const user = await this.prisma.user.findUnique({ where: { username }, select: { id: false } });
+    const user = await this.prisma.user.findUnique({ where: { username }, select: { id: true } });
     return user !== null;
   }
 
