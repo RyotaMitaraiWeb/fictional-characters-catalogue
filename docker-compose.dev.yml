@@ -19,6 +19,7 @@ services:
     # the database isn't running at that point
     command: >
       sh -c "npx prisma migrate deploy &&
+             npx prisma db seed &&
              npm run start:dev"
   postgres:
     container_name: postgres
