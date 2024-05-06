@@ -4,6 +4,7 @@ import { AuthRequestDto } from './dto/authRequest.dto';
 import { SuccessfulAuthenticationDto } from './dto/successfulAuthentication.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
+import { roles } from 'src/common/constants/roles';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,11 @@ export class AuthService {
       data: {
         username: registerBody.username,
         password: await bcrypt.hash(registerBody.password, this._saltRounds),
-        roles: ['User'],
+        roles: {
+          connect: {
+            id: roles.user.id,
+          },
+        },
       },
     });
 
@@ -52,7 +57,6 @@ export class AuthService {
     id: number;
     username: string;
     password: string;
-    roles: string[];
   }): SuccessfulAuthenticationDto {
     const result = new SuccessfulAuthenticationDto();
     result.id = user.id;
