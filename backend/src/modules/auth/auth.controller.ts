@@ -11,13 +11,14 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import { AuthRequestDto } from './dto/authRequest.dto';
+import { RegisterDto } from './dto/registerdto';
 import { SuccessfulAuthenticationResponseDto } from './dto/successfulAuthenticationResponse.dto';
 import { SuccessfulAuthenticationDto } from './dto/successfulAuthentication.dto';
 import { TokensDto } from './dto/tokens.dto';
 import { randomUUID } from 'crypto';
 import { ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { LoginDto } from './dto/loginDto';
 
 @ApiTags('Authentication and authorization')
 @Controller('auth')
@@ -31,7 +32,7 @@ export class AuthController {
   private _jwtSecret = this.configService.get('JWT_SECRET');
 
   @Post('register')
-  async register(@Body() body: AuthRequestDto): Promise<SuccessfulAuthenticationResponseDto> {
+  async register(@Body() body: RegisterDto): Promise<SuccessfulAuthenticationResponseDto> {
     const user = await this.authService.register(body);
     const tokens = await this._generateTokens(user);
 
@@ -42,7 +43,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() body: AuthRequestDto): Promise<SuccessfulAuthenticationResponseDto> {
+  async login(@Body() body: LoginDto): Promise<SuccessfulAuthenticationResponseDto> {
     const user = await this.authService.login(body);
     const tokens = await this._generateTokens(user);
 

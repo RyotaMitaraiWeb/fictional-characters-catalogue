@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 import { PrismaService } from 'src/common/services/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { SuccessfulAuthenticationDto } from './dto/successfulAuthentication.dto';
-import { AuthRequestDto } from './dto/authRequest.dto';
+import { RegisterDto } from './dto/registerdto';
 import { TokensDto } from './dto/tokens.dto';
 import { randomUUID } from 'crypto';
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
@@ -32,7 +32,7 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('Returns correct response when successful', async () => {
-      const register = new AuthRequestDto();
+      const register = new RegisterDto();
       register.username = 'ryota';
       register.password = '123456';
 
@@ -52,7 +52,7 @@ describe('AuthController', () => {
 
   describe('login', () => {
     it('Returns correct response when successful', async () => {
-      const register = new AuthRequestDto();
+      const register = new RegisterDto();
       register.username = 'ryota';
       register.password = '123456';
 

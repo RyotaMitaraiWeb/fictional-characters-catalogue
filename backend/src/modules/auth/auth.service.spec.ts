@@ -2,9 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/common/services/prisma.service';
-import { AuthRequestDto } from './dto/authRequest.dto';
+import { RegisterDto } from './dto/registerdto';
 import * as bcrypt from 'bcrypt';
 import { UnauthorizedException } from '@nestjs/common';
+import { LoginDto } from './dto/loginDto';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -31,7 +32,7 @@ describe('AuthService', () => {
 
   describe('register', () => {
     it('Returns a user if created successfully', async () => {
-      const register = new AuthRequestDto();
+      const register = new RegisterDto();
       register.username = 'a';
       register.password = '1';
 
@@ -52,7 +53,7 @@ describe('AuthService', () => {
 
   describe('login', () => {
     it('Returns a user if login is successful', async () => {
-      const login = new AuthRequestDto();
+      const login = new LoginDto();
       login.username = 'a';
       login.password = '1';
 
@@ -72,7 +73,7 @@ describe('AuthService', () => {
     });
 
     it('Throws an Unauthorized exception if the user does not exist', async () => {
-      const login = new AuthRequestDto();
+      const login = new LoginDto();
       login.username = 'a';
       login.password = '1';
 
@@ -82,7 +83,7 @@ describe('AuthService', () => {
     });
 
     it('Throws an Unauthorized exception if the password is wrong', async () => {
-      const login = new AuthRequestDto();
+      const login = new LoginDto();
       login.username = 'a';
       login.password = '1';
 
