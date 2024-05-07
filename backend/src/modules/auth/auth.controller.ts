@@ -8,6 +8,7 @@ import {
   Post,
   Query,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
@@ -18,9 +19,11 @@ import { TokensDto } from './dto/tokens.dto';
 import { randomUUID } from 'crypto';
 import { ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from 'src/guards/auth/auth.guard';
 
 @ApiTags('Authentication and authorization')
 @Controller('auth')
+@UseGuards(AuthGuard)
 export class AuthController {
   constructor(
     private readonly jwtService: JwtService,
