@@ -4,6 +4,12 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { ClaimsDto } from './dto/claims.dto';
 
+/**
+ * Inject this in any controller where you want to read
+ * JWT claims from the user. The service is scoped, so
+ * it works even if the claims are set
+ * by different requests.
+ */
 @Injectable({ scope: Scope.REQUEST })
 export class ClaimsService {
   constructor(
